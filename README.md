@@ -53,19 +53,19 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-2. Instalar dependencias:
+1. Instalar dependencias:
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-3. Crear un archivo .env basado en .env.example:
+1. Crear un archivo .env basado en .env.example:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-4. Ejecutar la aplicación:
+1. Ejecutar la aplicación:
 
 ```powershell
 uvicorn main:app --reload
@@ -73,8 +73,8 @@ uvicorn main:app --reload
 
 La API quedará disponible en:
 
-- http://127.0.0.1:8000/docs
-- http://127.0.0.1:8000/redoc
+- <http://127.0.0.1:8000/docs>
+- <http://127.0.0.1:8000/redoc>
 
 ## Variables de entorno
 
@@ -129,3 +129,9 @@ Este proyecto es ideal para estudiar:
 - Añadir migraciones con Alembic
 - Mejorar el manejo de roles y permisos
 - Preparar Docker para despliegue
+
+- [x] Arquitectura en capas (Routers, Services, Repositories)
+- [x] Autenticación JWT y Hashing
+- [x] Logging estructurado en JSON y Request ID
+- [ ] Tests unitarios y de integración con `pytest` (En proceso)
+- [ ] Dockerización de la aplicación (En proceso)
