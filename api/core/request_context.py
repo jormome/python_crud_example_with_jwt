@@ -1,7 +1,5 @@
-"""Utilidades para compartir información de contexto por petición."""
+"""Util to share context between requests"""
 
-import contextvars
+from contextvars import ContextVar
 
-request_id_var: contextvars.ContextVar[str] = contextvars.ContextVar(
-    "request_id", default="N/A"
-)
+request_id_var: ContextVar[int] = ContextVar("request_id", default=0)

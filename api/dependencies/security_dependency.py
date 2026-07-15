@@ -1,8 +1,10 @@
-"""Dependencias de seguridad para autenticar usuarios mediante JWT."""
+"""
+Secure dependency for authenticated users.
+"""
 
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
 from api.dependencies.user_dependency import get_user_service
@@ -17,11 +19,23 @@ def get_authenticated_user(
     service: Annotated[UserService, Depends(get_user_service)],
     token: Annotated[str, Depends(oauth2_scheme)],
 ) -> UserResponseDto:
-    """Valida un token JWT y devuelve el usuario autenticado."""
-    user_id: int = JwtService.decode_token(token)
-    user: UserResponseDto | None = service.find_by_id(user_id)
-    if user is None or not user.is_active:
+    """
+    Obtains the authenticated user from the token.
+    """
+    print("TOKEN:", token)
+
+    user_id = JwtService.verify_token(token)
+
+    print("USER_ID:", user_id)
+
+    user = service.find_by_id(user_id)
+
+    print("USER:", user)
+
+    if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or inactive user"
+            status_code=401,
+            detail="User not found or inactive",
         )
+
     return user

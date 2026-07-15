@@ -1,4 +1,6 @@
-"""Endpoints de autenticación para emitir tokens de acceso."""
+"""
+Auth router for authentication endpoints.
+"""
 
 from typing import Annotated
 
@@ -13,11 +15,10 @@ auth_router = APIRouter()
 
 
 @auth_router.post("/token", response_model=LoginResponseDto)
-def login(
+async def login(
     data: LoginRequestDto,
     service: Annotated[UserService, Depends(get_user_service)],
 ) -> LoginResponseDto:
-    """Autentica un usuario y devuelve un token JWT."""
     return service.login(data)
 
 

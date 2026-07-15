@@ -1,7 +1,8 @@
 """Conversores entre entidades SQLAlchemy y DTOs Pydantic."""
 
 from api.entities.user import User
-from api.schemas.user_dto import UserCreateDto, UserResponseDto
+from api.schemas.user_dto import UserCreateDto, UserResponseDto, UserUpdateDto
+from api.security.passwords_security import PasswordSecurity
 
 
 class UserMapper:
@@ -13,10 +14,12 @@ class UserMapper:
         return UserResponseDto.model_validate(entity)
 
     @staticmethod
-    def to_entity(dto: UserCreateDto) -> User:
-        """Convierte un DTO de creación en una entidad User."""
+    def to_entity(user: UserCreateDto | UserUpdateDto) -> User:
+        password = (
+            PasswordSecurity.hash_password(user.password) if user.password else None
+        )
         return User(
-            email=dto.email,
-            password=dto.password,
-            is_active=dto.is_active,
+            email=user.email,
+            password=password,
+            is_active=user.is_active,
         )

@@ -1,109 +1,85 @@
-"""Configuración de logging estructurado para la API."""
+"""Logging configuration"""
 
 import json
 import logging
-from contextvars import ContextVar
-from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 from api.core.request_context import request_id_var
 
-LOG_DIR = Path("logs")
-LOG_DIR.mkdir(exist_ok=True)
-
-request_id_var: ContextVar[str] = ContextVar("request_id", default="N/A")
+# config PRO empresarial está optimizada para escribir únicamente en consola (StreamHandler)
 
 
 class RequestIdFilter(logging.Filter):
-    """Añade el identificador de petición a cada registro de log."""
+    """Add request ID to log record"""
 
     def filter(self, record: logging.LogRecord) -> bool:
         record.request_id = request_id_var.get()
         return True
 
 
+#   transformar las líneas de texto tradicionales de tu consola en objetos JSON puros
 class JsonFormatter(logging.Formatter):
-    """Genera mensajes de log en formato JSON con metadatos útiles."""
+    """Format log records as JSON."""
 
     def format(self, record: logging.LogRecord) -> str:
-        log_obj: dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+        log_data: dict[str, str | int] = {
+            "timestamp": self.formatTime(record),
             "level": record.levelname,
             "module": record.module,
             "function": record.funcName,
             "line": record.lineno,
-            "request_id": getattr(record, "request_id", "N/A"),
+            "request_id": getattr(record, "request_id", ""),
             "message": record.getMessage(),
         }
-        if record.exc_info:
-            log_obj["exception"] = self.formatException(record.exc_info)
-        return json.dumps(log_obj, default=str)
+        return json.dumps(log_data)
 
 
-LOGGING_CONFIG: dict[str, Any] = {
+# Configuración de Logs optimizada para entornos Cloud / Producción.
+# TODOs va a la consola (stdout) en formato JSON a máxima velocidad.
+LOGGING_CONFIG_PRO: dict[str, Any] = {
+    # === 1. CONFIGURACIÓN ESTRUCTURAL ===
     "version": 1,
     "disable_existing_loggers": False,
-    "filters": {"request_id": {"()": "api.config.logging_config.RequestIdFilter"}},
-    "formatters": {
-        "json": {"()": "api.config.logging_config.JsonFormatter"},
-        "console": {
-            "format": "[%(asctime)s] %(levelname)s [%(request_id)s] %(module)s:%(lineno)d - %(message)s",
+    # === 2. SECCIÓN DE FILTROS ===
+    "filters": {
+        "request_id": {
+            "()": "api.config.logging_config.RequestIdFilter",
         },
     },
+    # === 3. SECCIÓN DE FORMATEADORES ===
+    "formatters": {
+        "json": {
+            "()": "api.config.logging_config.JsonFormatter",
+        },
+    },
+    # === 4. SECCIÓN DE HANDLERS ===
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "level": "DEBUG",
-            "formatter": "console",
-            "filters": ["request_id"],
-        },
-        "access_file": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": str(LOG_DIR / "access.log"),
-            "when": "midnight",
-            "backupCount": 30,
-            "formatter": "json",
-            "filters": ["request_id"],
             "level": "INFO",
-        },
-        "app_file": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": str(LOG_DIR / "app.log"),
-            "when": "midnight",
-            "backupCount": 30,
             "formatter": "json",
             "filters": ["request_id"],
-            "level": "INFO",
-        },
-        "error_file": {
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": str(LOG_DIR / "error.log"),
-            "when": "midnight",
-            "backupCount": 30,
-            "formatter": "json",
-            "filters": ["request_id"],
-            "level": "ERROR",
         },
     },
+    # === 5. SECCIÓN DE LOGGERS ===
     "loggers": {
         "uvicorn": {
-            "handlers": ["console", "app_file"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
         },
         "uvicorn.error": {
-            "handlers": ["console", "error_file"],
+            "handlers": ["console"],
             "level": "ERROR",
             "propagate": False,
         },
         "uvicorn.access": {
-            "handlers": ["console", "access_file"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
         },
         "api": {
-            "handlers": ["console", "app_file", "error_file", "access_file"],
+            "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
         },
@@ -113,5 +89,9 @@ LOGGING_CONFIG: dict[str, Any] = {
             "propagate": False,
         },
     },
-    "root": {"handlers": ["console", "app_file", "error_file"], "level": "INFO"},
+    # === 6. EL LOGGER RAÍZ (RED DE SEGURIDAD) ===
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
 }

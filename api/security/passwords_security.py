@@ -1,24 +1,28 @@
-"""Utilidades para el hashing y verificación de contraseñas."""
+"""
+Password security utilities using bcrypt.
+"""
 
 import bcrypt
 
 from api.config.settings import settings
 
 
-class PasswordHasher:
-    """Encapsula la lógica de seguridad para contraseñas."""
-
+class PasswordSecurity:
     @staticmethod
     def hash_password(password: str) -> str:
-        """Genera un hash seguro de una contraseña de texto plano."""
+        """Generate the hash of the password."""
+
         salt: bytes = bcrypt.gensalt(rounds=settings.BCRYPT_ROUNDS)
-        return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+        return bcrypt.hashpw(
+            password.encode("utf-8"),
+            salt,
+        ).decode("utf-8")
 
     @staticmethod
-    def verify_password(plain: str, hashed: str) -> bool:
-        """Comprueba si una contraseña en texto plano coincide con un hash."""
-        try:
-            return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+    def verify_password(password: str, hashed_password: str) -> bool:
+        """Verify the password."""
 
-        except (ValueError, TypeError, AttributeError):
-            return False
+        return bcrypt.checkpw(
+            password.encode("utf-8"),
+            hashed_password.encode("utf-8"),
+        )

@@ -1,24 +1,23 @@
-"""Gestión de configuraciones globales de la aplicación."""
+"""Global configuration management"""
 
-from dotenv import load_dotenv
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-load_dotenv()
 
 
 class Settings(BaseSettings):
-    """Carga y valida la configuración desde variables de entorno."""
+    """Carga y valida la configuracion desde las variables de entorno
 
-    JWT_SECRET_KEY: str
-    JWT_ALGORITHM: str = "HS256"
-    JWT_EXP_MINUTES: int = 60
-    DATABASE_URI: str = "sqlite:///./db.sqlite"
-    BCRYPT_ROUNDS: int = 12
+    Args:
+        BaseSettings (_type_): _description_
+    """
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-    )
+    DATABASE_URI: str = Field(default="")
+    SECRET_KEY: str = Field(default="")
+    ALGORITHM: str = Field(default="HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=60)
+    BCRYPT_ROUNDS: int = Field(default=12)
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
-settings = Settings()  # pyright: ignore[reportCallIssue]
+settings = Settings()
