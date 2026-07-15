@@ -1,17 +1,23 @@
-"""Modelos de datos para el flujo de autenticación con JWT."""
+"""
+DTOs for auth operations.
+"""
 
 from pydantic import BaseModel, EmailStr
 
 
 class LoginRequestDto(BaseModel):
-    """DTO con las credenciales enviadas para iniciar sesión."""
+    """
+    Request schema for login. Contains email and password from the user.
+    """
 
     email: EmailStr
     password: str
 
 
 class LoginResponseDto(BaseModel):
-    """DTO que devuelve el token de acceso después de autenticar."""
+    """
+    Response schema for login. Returns the token and its type after authentication.
+    """
 
     access_token: str
     token_type: str = "bearer"

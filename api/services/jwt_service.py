@@ -1,30 +1,29 @@
-"""Helpers for creating and validating JWT-based access tokens."""
+"""
+Service for JWT operations (create and validate).
+"""
 
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException
-from jose import JWTError, jwt
+from jose import jwt
 
 from api.config.settings import settings
 from api.schemas.user_dto import UserResponseDto
 
 
 class JwtService:
-    """Utility service for issuing and validating JWT access tokens."""
+    """
+    Service for JWT operations.
+    """
 
     @staticmethod
-    def create_access_token(user: UserResponseDto) -> str:
-        """Create a signed JWT for an authenticated user.
-
-        Args:
-            user: The authenticated user whose identity will be encoded.
-
-        Returns:
-            A compact JWT string that can be used as an access token.
+    def create_token(user: UserResponseDto) -> str:
+        """
+        Create the JWT token for user.
         """
         expire: datetime = datetime.now(UTC) + timedelta(
-            minutes=settings.JWT_EXP_MINUTES
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
         payload: dict[str, Any] = {
             "sub": str(user.id),
@@ -33,29 +32,27 @@ class JwtService:
             "exp": expire,
         }
         return jwt.encode(
-            payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+            payload,
+            settings.SECRET_KEY,
+            algorithm=settings.ALGORITHM,
         )
 
     @staticmethod
-    def decode_token(token: str) -> int:
-        """Decode and validate a JWT token, returning the user identifier.
-
-        Args:
-            token: The JWT string received from the client.
-
-        Returns:
-            The user identifier stored in the token payload.
-
-        Raises:
-            HTTPException: If the token is missing, malformed, or invalid.
+    def verify_token(token: str) -> int:
+        """
+        Verify the JWT token.
         """
         try:
             payload: dict[str, Any] = jwt.decode(
-                token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+                token,
+                settings.SECRET_KEY,
+                algorithms=[settings.ALGORITHM],
             )
-            user_id: Any | None = payload.get("sub")
+            user_id: str | None = payload.get("sub")
             if user_id is None:
-                raise HTTPException(status_code=401, detail="Invalid token")
+                raise HTTPException(status_code=401, detail="Token inválido")
             return int(user_id)
-        except JWTError as exc:
-            raise HTTPException(status_code=401, detail="Invalid token") from exc
+
+        except Exception as e:
+            print(repr(e))
+            raise

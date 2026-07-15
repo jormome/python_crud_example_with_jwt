@@ -1,33 +1,75 @@
-"""Excepciones de negocio utilizadas por la API."""
+"""
+Custom exceptions for the API
+"""
 
-from typing import Any
-
-
-class BussinessError(Exception):
-    """Base para errores controlados de la aplicación."""
-
-    def __init__(self, message: str, detail: Any = None) -> None:
-        super().__init__(message)
-        self.message: str = message
-        self.detail: Any = detail
+from http import HTTPStatus
 
 
-class NotFoundError(BussinessError):
-    """Se lanza cuando un recurso solicitado no existe."""
+class APIException(Exception):
+    """
+    Base exception for all API exceptions
 
-    def __init__(self, message: str = "Resource not found") -> None:
-        super().__init__(message)
+    Permits to middleware to catch all API exceptions
+    """
+
+    # al usar HTTPStatus desacoplo las excepciones de FastApi
+    status_code: int = HTTPStatus.INTERNAL_SERVER_ERROR
+    default_message: str = "Internal server error"
+
+    def __init__(self, message: str | None = None):
+        self.message = message or self.default_message
+        super().__init__(self.message)
 
 
-class ConflictError(BussinessError):
-    """Se lanza cuando hay un conflicto con el estado actual de los datos."""
+class ConnectionException(APIException):
+    """
+    Exception raised when there is a connection error
+    """
 
-    def __init__(self, message: str = "Conflict") -> None:
-        super().__init__(message)
+    status_code = HTTPStatus.SERVICE_UNAVAILABLE
+    default_message = "Connection error"
 
 
-class UnauthorizedError(BussinessError):
-    """Se lanza cuando una operación requiere autenticación o permisos."""
+class BusinessException(APIException):
+    """
+    Exception raised when there is a business error
+    """
 
-    def __init__(self, message: str = "Unauthorized") -> None:
-        super().__init__(message)
+    status_code = HTTPStatus.BAD_REQUEST
+    default_message = "Business error"
+
+
+class NotFoundException(APIException):
+    """
+    Exception raised when a resource is not found
+    """
+
+    status_code = HTTPStatus.NOT_FOUND
+    default_message = "Resource not found"
+
+
+class ConflictException(APIException):
+    """
+    Exception raised when there is a conflict
+    """
+
+    status_code = HTTPStatus.CONFLICT
+    default_message = "Conflict"
+
+
+class AuthorizationException(APIException):
+    """
+    Exception raised when there is an authorization error
+    """
+
+    status_code = HTTPStatus.UNAUTHORIZED
+    default_message = "Unauthorized"
+
+
+class AuthenticationException(APIException):
+    """
+    Exception raised when there is an authentication error
+    """
+
+    status_code = HTTPStatus.FORBIDDEN
+    default_message = "Authentication error"
