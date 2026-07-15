@@ -16,8 +16,11 @@ class APIException(Exception):
     status_code: int = HTTPStatus.INTERNAL_SERVER_ERROR
     default_message: str = "Internal server error"
 
-    def __init__(self, message: str | None = None):
-        self.message = message or self.default_message
+    def __init__(
+        self,
+        message: str | None = None,
+    ) -> None:
+        self.message: str = message or self.default_message
         super().__init__(self.message)
 
 

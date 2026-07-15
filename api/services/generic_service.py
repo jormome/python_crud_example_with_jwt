@@ -17,27 +17,37 @@ ID = TypeVar("ID")
 logger: logging.Logger = logging.getLogger(__name__)
 
 
-class GenericService(ABC, Generic[T, ID]):
+class GenericService(
+    ABC,
+    Generic[T, ID],
+):
     """Service responsible for user CRUD operations and authentication."""
 
-    def __init__(self, repository: RepositoryProtocol[T, ID]):
+    def __init__(
+        self,
+        repository: RepositoryProtocol[T, ID],
+    ) -> None:
         """
         Initialize the service with a repository.
 
         Args:
             repository: The repository to use for database operations
         """
+
         self.repository: RepositoryProtocol[T, ID] = repository
         self._session: Session = repository.session
 
     @contextmanager
-    def _transaction(self) -> Generator[None, None, None]:
+    def _transaction(
+        self,
+    ) -> Generator[None, None, None]:
         """
         Context manager for database transactions.
 
         Yields:
             None
         """
+
         try:
             yield
             self._session.commit()
@@ -53,13 +63,16 @@ class GenericService(ABC, Generic[T, ID]):
             logger.error(f"Unexpected error inside transaction: {e}", exc_info=True)
             raise
 
-    def find_all(self) -> list[T]:
+    def find_all(
+        self,
+    ) -> list[T]:
         """
         Get all entities.
 
         Returns:
             list[DTO]: List of all entities
         """
+
         return self.repository.find_all()
 
     def find_by_id(
@@ -82,7 +95,10 @@ class GenericService(ABC, Generic[T, ID]):
             raise NotFoundException("Entity not found")
         return entity
 
-    def create(self, entity: T) -> T:
+    def create(
+        self,
+        entity: T,
+    ) -> T:
         """
         Save an entity.
 
@@ -92,6 +108,7 @@ class GenericService(ABC, Generic[T, ID]):
         Returns:
             DTO: The saved entity
         """
+
         with self._transaction():
             return self.repository.add(entity)
 
@@ -124,12 +141,16 @@ class GenericService(ABC, Generic[T, ID]):
 
             return self.repository.add(entity)
 
-    def delete(self, entity_id: ID) -> None:
+    def delete(
+        self,
+        entity_id: ID,
+    ) -> None:
         """
         Delete an entity.
 
         Args:
             entity_id: The ID of the entity to delete
         """
+
         with self._transaction():
             self.repository.delete(entity_id)

@@ -9,13 +9,18 @@ class UserMapper:
     """Centraliza la transformación entre modelos internos y respuestas externas."""
 
     @staticmethod
-    def to_response_dto(entity: User) -> UserResponseDto:
+    def to_response_dto(
+        entity: User,
+    ) -> UserResponseDto:
         """Convierte una entidad User en un DTO de respuesta."""
+
         return UserResponseDto.model_validate(entity)
 
     @staticmethod
-    def to_entity(user: UserCreateDto | UserUpdateDto) -> User:
-        password = (
+    def to_entity(
+        user: UserCreateDto | UserUpdateDto,
+    ) -> User:
+        password: str | None = (
             PasswordSecurity.hash_password(user.password) if user.password else None
         )
         return User(

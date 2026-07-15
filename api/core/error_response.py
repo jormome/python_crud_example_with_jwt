@@ -24,6 +24,7 @@ def build_error_response(
     Returns:
         JSONResponse: Standardized error response
     """
+
     return JSONResponse(
         status_code=status_code,
         content={
@@ -38,7 +39,9 @@ def build_error_response(
     )
 
 
-def build_validation_error_response(errors: list[dict[str, str]]) -> JSONResponse:
+def build_validation_error_response(
+    errors: list[dict[str, str]],
+) -> JSONResponse:
     """
     Build a validation error response with multiple field errors.
 
@@ -48,6 +51,7 @@ def build_validation_error_response(errors: list[dict[str, str]]) -> JSONRespons
     Returns:
         JSONResponse: Validation error response
     """
+
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={"errors": errors},

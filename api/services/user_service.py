@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from fastapi import HTTPException
 
@@ -20,11 +21,17 @@ class UserService(
         int,
     ]
 ):
-    def __init__(self, repository: UserRepository):
+    def __init__(
+        self,
+        repository: UserRepository,
+    ) -> None:
         super().__init__(repository)
         self.user_repository: UserRepository = repository
 
-    def get_by_email(self, email: str) -> User:
+    def get_by_email(
+        self,
+        email: str,
+    ) -> User:
         """
         Find a user by email.
 
@@ -34,13 +41,18 @@ class UserService(
         Returns:
             User: The user with the given email
         """
-        user = self.user_repository.find_by_email(email)
+
+        user: User | None = self.user_repository.find_by_email(email)
         if user is None:
             logger.warning(f"User with email {email} not found")
             raise NotFoundException("User not found")
         return user
 
-    def update(self, entity_id: int, user: UserUpdateDto) -> User:
+    def update(
+        self,
+        entity_id: int,
+        user: UserUpdateDto,
+    ) -> User:
         """
         Update a user.
 
@@ -51,12 +63,17 @@ class UserService(
         Returns:
             User: The updated user
         """
-        changes = user.model_dump(exclude_unset=True)
+
+        changes: dict[str, Any] = user.model_dump(exclude_unset=True)
         if "password" in changes:
             changes["password"] = PasswordSecurity.hash_password(changes["password"])
         return self._apply_changes(entity_id, changes)
 
-    def authenticate(self, email: str, password: str) -> User:
+    def authenticate(
+        self,
+        email: str,
+        password: str,
+    ) -> User:
         """
         Authenticate a user.
 
@@ -67,6 +84,7 @@ class UserService(
         Returns:
             User: The authenticated user
         """
+
         user: User | None = self.user_repository.find_by_email(email)
 
         if user is None:
@@ -82,7 +100,10 @@ class UserService(
         return user
 
     # Aquí sí acepto DTO. Porque login es un caso de uso. No un CRUD.
-    def login(self, dto: LoginRequestDto) -> LoginResponseDto:
+    def login(
+        self,
+        dto: LoginRequestDto,
+    ) -> LoginResponseDto:
         """Authenticate a user and generate an access token.
 
         Args:
@@ -94,6 +115,7 @@ class UserService(
         Raises:
             HTTPException: If the credentials are invalid or the user is inactive.
         """
+
         user: User = self.authenticate(dto.email, dto.password)
 
         if not user.is_active:

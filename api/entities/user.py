@@ -13,7 +13,7 @@ class User(EntityBase):
     User entity for the database
     """
 
-    __tablename__ = "users"
+    __tablename__: str = "users"
 
     email: Mapped[str] = mapped_column(
         String(150),

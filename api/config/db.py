@@ -3,6 +3,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm.session import Session
 
 from ..exceptions.exceptions import ConnectionException
 from .settings import settings
@@ -17,6 +18,10 @@ engine: Engine = create_engine(
     max_overflow=20,
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal: sessionmaker[Session] = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+)
 
 Base = declarative_base()

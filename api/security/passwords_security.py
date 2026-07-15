@@ -9,7 +9,9 @@ from api.config.settings import settings
 
 class PasswordSecurity:
     @staticmethod
-    def hash_password(password: str) -> str:
+    def hash_password(
+        password: str,
+    ) -> str:
         """Generate the hash of the password."""
 
         salt: bytes = bcrypt.gensalt(rounds=settings.BCRYPT_ROUNDS)
@@ -19,7 +21,10 @@ class PasswordSecurity:
         ).decode("utf-8")
 
     @staticmethod
-    def verify_password(password: str, hashed_password: str) -> bool:
+    def verify_password(
+        password: str,
+        hashed_password: str,
+    ) -> bool:
         """Verify the password."""
 
         return bcrypt.checkpw(

@@ -34,6 +34,7 @@ def _log_error(
         level: Logging level (default: WARNING)
         extra_context: Additional context to include in log
     """
+
     req_id = request.state.request_id if hasattr(request.state, "request_id") else "N/A"
     logger.log(
         level,
@@ -43,7 +44,10 @@ def _log_error(
     )
 
 
-async def api_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+async def api_exception_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
     """
     Handle custom API exceptions.
 
@@ -54,6 +58,7 @@ async def api_exception_handler(request: Request, exc: Exception) -> JSONRespons
     Returns:
         JSONResponse: Standardized error response
     """
+
     _log_error(request, exc)
     return build_error_response(
         status_code=exc.status_code if isinstance(exc, APIException) else 500,
@@ -62,7 +67,10 @@ async def api_exception_handler(request: Request, exc: Exception) -> JSONRespons
     )
 
 
-async def value_error_handler(request: Request, exc: Exception) -> JSONResponse:
+async def value_error_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
     """
     Handle ValueError exceptions.
 
@@ -73,6 +81,7 @@ async def value_error_handler(request: Request, exc: Exception) -> JSONResponse:
     Returns:
         JSONResponse: Standardized error response
     """
+
     _log_error(request, exc, level=logging.ERROR)
     return build_error_response(
         status_code=500,
@@ -81,7 +90,10 @@ async def value_error_handler(request: Request, exc: Exception) -> JSONResponse:
     )
 
 
-async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+async def generic_exception_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
     """
     Handle all unhandled exceptions.
 
@@ -92,7 +104,12 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
     Returns:
         JSONResponse: Standardized error response
     """
-    _log_error(request, exc, level=logging.ERROR)
+
+    _log_error(
+        request,
+        exc,
+        level=logging.ERROR,
+    )
     traceback.print_exc()
 
     return build_error_response(
@@ -102,7 +119,10 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
     )
 
 
-async def validation_error_handler(request: Request, exc: Exception) -> JSONResponse:
+async def validation_error_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
     """
     Handle Pydantic validation errors.
 
@@ -113,7 +133,11 @@ async def validation_error_handler(request: Request, exc: Exception) -> JSONResp
     Returns:
         JSONResponse: Standardized validation error response
     """
-    assert isinstance(exc, RequestValidationError)
+
+    assert isinstance(
+        exc,
+        RequestValidationError,
+    )
     custom_errors: list[dict[str, str]] = []
 
     for error in exc.errors():
@@ -133,7 +157,7 @@ async def validation_error_handler(request: Request, exc: Exception) -> JSONResp
             continue
 
         # Extract field name from location
-        field_name = _extract_field_name(loc)
+        field_name: str = _extract_field_name(loc)
         custom_errors.append(
             {
                 "field_name": field_name,
@@ -142,11 +166,17 @@ async def validation_error_handler(request: Request, exc: Exception) -> JSONResp
             }
         )
 
-    _log_error(request, exc, level=logging.WARNING)
+    _log_error(
+        request,
+        exc,
+        level=logging.WARNING,
+    )
     return build_validation_error_response(custom_errors)
 
 
-def _extract_field_name(loc: tuple[Any, ...] | list[Any]) -> str:
+def _extract_field_name(
+    loc: tuple[Any, ...] | list[Any],
+) -> str:
     """
     Extract field name from Pydantic error location.
 
@@ -156,6 +186,7 @@ def _extract_field_name(loc: tuple[Any, ...] | list[Any]) -> str:
     Returns:
         str: Field name or "unknown_field"
     """
+
     if not loc:
         return "unknown_field"
 

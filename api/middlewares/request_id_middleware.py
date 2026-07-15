@@ -13,7 +13,11 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 
 async def request_id_middleware(
-    request: Request, call_next: Callable[..., Awaitable[Response]]
+    request: Request,
+    call_next: Callable[
+        ...,
+        Awaitable[Response],
+    ],
 ) -> Response:
     """
     Add a unique request ID to each request for tracing.
@@ -28,8 +32,12 @@ async def request_id_middleware(
     Returns:
         Response: The response from the next middleware/route
     """
+
     # Get or generate request ID
-    request_id = request.headers.get("x-request-id", str(uuid4()))
+    request_id: str = request.headers.get(
+        "x-request-id",
+        str(uuid4()),
+    )
 
     # Store in request state for access in handlers/routes
     request.state.request_id = request_id
