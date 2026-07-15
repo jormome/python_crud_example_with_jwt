@@ -18,10 +18,13 @@ class JwtService:
     """
 
     @staticmethod
-    def create_token(user: UserResponseDto) -> str:
+    def create_token(
+        user: UserResponseDto,
+    ) -> str:
         """
         Create the JWT token for user.
         """
+
         expire: datetime = datetime.now(UTC) + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
@@ -38,10 +41,13 @@ class JwtService:
         )
 
     @staticmethod
-    def verify_token(token: str) -> int:
+    def verify_token(
+        token: str,
+    ) -> int:
         """
         Verify the JWT token.
         """
+
         try:
             payload: dict[str, Any] = jwt.decode(
                 token,
@@ -50,7 +56,10 @@ class JwtService:
             )
             user_id: str | None = payload.get("sub")
             if user_id is None:
-                raise HTTPException(status_code=401, detail="Token inválido")
+                raise HTTPException(
+                    status_code=401,
+                    detail="Token inválido",
+                )
             return int(user_id)
 
         except Exception as e:

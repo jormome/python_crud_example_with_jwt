@@ -2,7 +2,7 @@
 User dependency for database operations.
 """
 
-from typing import Annotated
+from typing import Annotated, Any, Generator
 
 from fastapi import Depends
 from sqlalchemy.orm import Session
@@ -12,12 +12,12 @@ from api.repositories.user_repository import UserRepository
 from api.services.user_service import UserService
 
 
-def get_db():
+def get_db() -> Generator[Session, Any, None]:
     """
     Dependecy to get a database session.
     """
 
-    db = SessionLocal()
+    db: Session = SessionLocal()
     try:
         yield db
 
@@ -38,7 +38,10 @@ def get_user_repository(
 
 
 def get_user_service(
-    repository: Annotated[UserRepository, Depends(get_user_repository)],
+    repository: Annotated[
+        UserRepository,
+        Depends(get_user_repository),
+    ],
 ) -> UserService:
     """
     Creates a user service for each request.

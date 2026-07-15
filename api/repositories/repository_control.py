@@ -7,7 +7,10 @@ from typing import Protocol, TypeVar
 from sqlalchemy.orm import Session
 
 T = TypeVar("T")
-ID = TypeVar("ID", contravariant=True)
+ID = TypeVar(
+    "ID",
+    contravariant=True,
+)
 
 
 class RepositoryProtocol(Protocol[T, ID]):
