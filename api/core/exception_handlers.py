@@ -35,7 +35,9 @@ def _log_error(
         extra_context: Additional context to include in log
     """
 
-    req_id = request.state.request_id if hasattr(request.state, "request_id") else "N/A"
+    req_id: str = (
+        request.state.request_id if hasattr(request.state, "request_id") else "N/A"
+    )
     logger.log(
         level,
         f"API Error at {request.method} {request.url.path} - Request ID: {req_id} - "
@@ -59,7 +61,10 @@ async def api_exception_handler(
         JSONResponse: Standardized error response
     """
 
-    _log_error(request, exc)
+    _log_error(
+        request,
+        exc,
+    )
     return build_error_response(
         status_code=exc.status_code if isinstance(exc, APIException) else 500,
         message=exc.message if isinstance(exc, APIException) else str(exc),
@@ -82,7 +87,11 @@ async def value_error_handler(
         JSONResponse: Standardized error response
     """
 
-    _log_error(request, exc, level=logging.ERROR)
+    _log_error(
+        request,
+        exc,
+        level=logging.ERROR,
+    )
     return build_error_response(
         status_code=500,
         message="Internal server error",
@@ -141,12 +150,12 @@ async def validation_error_handler(
     custom_errors: list[dict[str, str]] = []
 
     for error in exc.errors():
-        loc = error.get("loc", [])
-        error_type = error.get("type", "")
+        loc: list[str] = error.get("loc", [])
+        error_type: str = error.get("type", "")
 
         # Handle JSON parsing errors
         if error_type == "json_invalid":
-            position = str(loc[-1] if loc else "unknown")
+            position: str = str(loc[-1] if loc else "unknown")
             custom_errors.append(
                 {
                     "field_name": "body_json",

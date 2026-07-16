@@ -23,6 +23,12 @@ class JwtService:
     ) -> str:
         """
         Create the JWT token for user.
+
+        Args:
+            user: The user to create the token for
+
+        Returns:
+            str: The JWT token
         """
 
         expire: datetime = datetime.now(UTC) + timedelta(
@@ -46,6 +52,12 @@ class JwtService:
     ) -> int:
         """
         Verify the JWT token.
+
+        Args:
+            token: The JWT token to verify
+
+        Returns:
+            int: The user ID
         """
 
         try:

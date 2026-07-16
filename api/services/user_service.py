@@ -21,10 +21,21 @@ class UserService(
         int,
     ]
 ):
+    """
+    User service for handling user-related operations
+    """
+
     def __init__(
         self,
         repository: UserRepository,
     ) -> None:
+        """
+        Initialize the user service.
+
+        Args:
+            repository: The user repository to use
+        """
+
         super().__init__(repository)
         self.user_repository: UserRepository = repository
 
@@ -89,7 +100,6 @@ class UserService(
 
         if user is None:
             logger.warning(f"User with email {email} not found")
-            # raise HTTPException(status_code=401, detail="Incorrect email or password")
             # con esta excepcion personalizada queda mas desacoplado de FastAPI
             raise AuthenticationException("Incorrect email or password")
 
@@ -99,7 +109,6 @@ class UserService(
 
         return user
 
-    # Aquí sí acepto DTO. Porque login es un caso de uso. No un CRUD.
     def login(
         self,
         dto: LoginRequestDto,

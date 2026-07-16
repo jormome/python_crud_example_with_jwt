@@ -28,17 +28,17 @@ def get_authenticated_user(
 ) -> UserResponseDto:
     """
     Obtains the authenticated user from the token.
+
+    Args:
+        service: UserService instance
+        token: JWT token
+
+    Returns:
+        UserResponseDto: Authenticated user
     """
 
-    print("TOKEN:", token)
-
     user_id: int = JwtService.verify_token(token)
-
-    print("USER_ID:", user_id)
-
     user: User = service.find_by_id(user_id)
-
-    print("USER:", user)
 
     if not user.is_active:
         raise HTTPException(
