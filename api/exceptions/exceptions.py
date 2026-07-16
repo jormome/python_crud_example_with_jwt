@@ -20,6 +20,13 @@ class APIException(Exception):
         self,
         message: str | None = None,
     ) -> None:
+        """
+        Initialize the exception with a message.
+
+        Args:
+            message: Custom error message
+        """
+
         self.message: str = message or self.default_message
         super().__init__(self.message)
 

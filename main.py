@@ -2,10 +2,7 @@
 FastAPI application configuration with centralized exception handling and middleware.
 """
 
-from types import CoroutineType
-from typing import Any, Callable
-
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
 # Import entities to ensure SQLAlchemy models are registered
@@ -23,9 +20,7 @@ from api.routers import auth_router, user_router
 app = FastAPI()
 
 # Middleware
-_: Callable[..., CoroutineType[Any, Any, Response]] = app.middleware("http")(
-    request_id_middleware
-)
+app.middleware("http")(request_id_middleware)
 
 # Exception Handlers
 app.add_exception_handler(

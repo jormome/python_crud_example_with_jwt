@@ -25,6 +25,17 @@ async def login(
         Depends(get_user_service),
     ],
 ) -> LoginResponseDto:
+    """
+    Login endpoint.
+
+    Args:
+        data: The login request data
+        service: The user service
+
+    Returns:
+        LoginResponseDto: The login response data
+    """
+
     return service.login(data)
 
 
@@ -42,7 +53,16 @@ def login_form(
         Depends(get_user_service),
     ],
 ) -> LoginResponseDto:
-    """Acepta credenciales desde un formulario y devuelve un token JWT."""
+    """
+    Acepta credenciales desde un formulario y devuelve un token JWT.
+
+    Args:
+        form: The OAuth2 password request form
+        service: The user service
+
+    Returns:
+        LoginResponseDto: The login response data
+    """
 
     return service.login(
         LoginRequestDto(

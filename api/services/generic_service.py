@@ -10,7 +10,10 @@ from api.entities.entity_base import EntityBase
 from api.exceptions.exceptions import NotFoundException
 from api.repositories.repository_control import RepositoryProtocol
 
-T = TypeVar("T", bound=EntityBase)
+T = TypeVar(
+    "T",
+    bound=EntityBase,
+)
 ID = TypeVar("ID")
 
 
@@ -21,7 +24,9 @@ class GenericService(
     ABC,
     Generic[T, ID],
 ):
-    """Service responsible for user CRUD operations and authentication."""
+    """
+    Generic service responsible for user CRUD operations and authentication.
+    """
 
     def __init__(
         self,
@@ -78,7 +83,7 @@ class GenericService(
     def find_by_id(
         self,
         id: ID,
-    ) -> T:  # devuelvo siempre T porque si es None lanzo un error
+    ) -> T:
         """
         Find an entity by ID.
 
@@ -133,7 +138,6 @@ class GenericService(
         """
 
         with self._transaction():
-            # find_by_id already raises NotFoundException if entity not found
             entity: T = self.find_by_id(entity_id)
 
             for field, value in changes.items():

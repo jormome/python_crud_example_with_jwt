@@ -31,7 +31,15 @@ def list_users(
         Depends(get_authenticated_user),
     ],
 ) -> list[UserResponseDto]:
-    """Devuelve la lista completa de usuarios."""
+    """Returns the list of all users.
+
+    Args:
+        service: The user service
+        authenticated_user: The authenticated user
+
+    Returns:
+        list[UserResponseDto]: The list of users
+    """
 
     users: list[User] = service.find_all()
     return [UserMapper.to_response_dto(user) for user in users]
@@ -52,7 +60,16 @@ def list_by_id(
         Depends(get_authenticated_user),
     ],
 ) -> UserResponseDto:
-    """Devuelve un usuario específico si coincide con el usuario autenticado."""
+    """Returns a specific user if it matches the authenticated user.
+
+    Args:
+        user_id: The user id
+        service: The user service
+        authenticated_user: The authenticated user
+
+    Returns:
+        UserResponseDto: The user
+    """
 
     if user_id != authenticated_user.id:
         raise AuthorizationException()
@@ -73,7 +90,15 @@ def create(
     ],
     user: UserCreateDto,
 ) -> UserResponseDto:
-    """Crea un nuevo usuario en el sistema."""
+    """Creates a new user in the system.
+
+    Args:
+        service: The user service
+        user: The user to create
+
+    Returns:
+        UserResponseDto: The created user
+    """
 
     return service.create(UserMapper.to_entity(user))
 
@@ -94,7 +119,17 @@ def update(
         Depends(get_authenticated_user),
     ],
 ) -> UserResponseDto:
-    """Actualiza los datos de un usuario autenticado."""
+    """Updates the data of an authenticated user.
+
+    Args:
+        service: The user service
+        user_id: The user id
+        user: The user to update
+        authenticated_user: The authenticated user
+
+    Returns:
+        UserResponseDto: The updated user
+    """
 
     if user_id != authenticated_user.id:
         raise AuthorizationException()
@@ -118,7 +153,16 @@ def delete(
         Depends(get_authenticated_user),
     ],
 ) -> Response:
-    """Elimina un usuario autenticado del sistema."""
+    """Deletes an authenticated user from the system.
+
+    Args:
+        service: The user service
+        user_id: The user id
+        authenticated_user: The authenticated user
+
+    Returns:
+        Response: The response
+    """
 
     if user_id != authenticated_user.id:
         raise AuthorizationException()

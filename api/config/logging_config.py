@@ -12,7 +12,20 @@ from api.core.request_context import request_id_var
 class RequestIdFilter(logging.Filter):
     """Add request ID to log record"""
 
-    def filter(self, record: logging.LogRecord) -> bool:
+    def filter(
+        self,
+        record: logging.LogRecord,
+    ) -> bool:
+        """
+        Add request ID to log record
+
+        Args:
+            record: Log record
+
+        Returns:
+            bool
+        """
+
         record.request_id = request_id_var.get()
         return True
 
@@ -21,7 +34,20 @@ class RequestIdFilter(logging.Filter):
 class JsonFormatter(logging.Formatter):
     """Format log records as JSON."""
 
-    def format(self, record: logging.LogRecord) -> str:
+    def format(
+        self,
+        record: logging.LogRecord,
+    ) -> str:
+        """
+        Format log record as JSON
+
+        Args:
+            record: Log record
+
+        Returns:
+            str
+        """
+
         log_data: dict[str, str | int] = {
             "timestamp": self.formatTime(record),
             "level": record.levelname,
